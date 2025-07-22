@@ -9,8 +9,8 @@ import (
 
 type Product struct {
 	gorm.Model
-	Code  string
-	Price int
+	Code  string `json:"code"`
+	Price int    `json:"price"`
 }
 
 func main() {
@@ -23,15 +23,42 @@ func main() {
 
 	e := echo.New()
 
-	e.GET("/product", func(c echo.Context) error {
-		var product Product
-		db.First(&product, 1)
-		return c.String(http.StatusOK, "Hello, World!")
+	e.GET("/", func(c echo.Context) error {
+		return c.String(http.StatusOK, "Hello, world!\n")
 	})
 
-	e.POST("/product", func(c echo.Context) error {
-		db.Create(&Product{Code: "d42", Price: 100})
-		return c.String(http.StatusOK, "added new product!")
+	e.GET("/product/:id", func(c echo.Context) error {
+		id := c.Param("id")
+		var product Product
+		result := db.First(&product, id)
+		if result.Error != nil {
+			if result.Error == gorm.ErrRecordNotFound {
+				return c.NoContent(http.StatusNotFound)
+			}
+			return c.JSON(http.StatusInternalServerError, map[string]string{"error": result.Error.Error()})
+		}
+		return c.JSON(http.StatusOK, product)
+	})
+
+	e.GET("/products", func(c echo.Context) error {
+		var products []Product
+		result := db.Find(&products)
+		if result.Error != nil {
+			return c.JSON(http.StatusInternalServerError, map[string]string{"error": result.Error.Error()})
+		}
+		return c.JSON(http.StatusOK, products)
+	})
+
+	e.POST("product", func(c echo.Context) error {
+		product := new(Product)
+		if err := c.Bind(product); err != nil {
+			return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+		}
+		result := db.Create(product)
+		if result.Error != nil {
+			return c.JSON(http.StatusInternalServerError, map[string]string{"error": result.Error.Error()})
+		}
+		return c.JSON(http.StatusCreated, product)
 	})
 
 	e.Logger.Fatal(e.Start(":1323"))
