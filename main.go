@@ -6,7 +6,7 @@ import (
 	"gorm.io/gorm"
 	"net/http"
 
-	. "myapp/model"
+	"myapp/model"
 )
 
 func main() {
@@ -15,7 +15,7 @@ func main() {
 		panic("failed to connect database")
 	}
 
-	db.AutoMigrate(&Product{})
+	db.AutoMigrate(&model.Product{})
 
 	e := echo.New()
 
@@ -25,7 +25,7 @@ func main() {
 
 	e.GET("/product/:id", func(c echo.Context) error {
 		id := c.Param("id")
-		var product Product
+		var product model.Product
 		result := db.First(&product, id)
 		if result.Error != nil {
 			if result.Error == gorm.ErrRecordNotFound {
@@ -37,7 +37,7 @@ func main() {
 	})
 
 	e.GET("/products", func(c echo.Context) error {
-		var products []Product
+		var products []model.Product
 		result := db.Find(&products)
 		if result.Error != nil {
 			return c.JSON(http.StatusInternalServerError, map[string]string{"error": result.Error.Error()})
@@ -46,7 +46,7 @@ func main() {
 	})
 
 	e.POST("product", func(c echo.Context) error {
-		product := new(Product)
+		product := new(model.Product)
 		if err := c.Bind(product); err != nil {
 			return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 		}
