@@ -5,13 +5,9 @@ import (
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"net/http"
-)
 
-type Product struct {
-	gorm.Model
-	Code  string `json:"code"`
-	Price int    `json:"price"`
-}
+	. "myapp/model"
+)
 
 func main() {
 	db, err := gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
