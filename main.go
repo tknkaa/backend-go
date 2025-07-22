@@ -4,8 +4,8 @@ import (
 	"github.com/labstack/echo/v4"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
-	"net/http"
 
+	"myapp/handler"
 	"myapp/model"
 )
 
@@ -19,43 +19,12 @@ func main() {
 
 	e := echo.New()
 
-	e.GET("/", func(c echo.Context) error {
-		return c.String(http.StatusOK, "Hello, world!\n")
-	})
+	h := &handler.Handler{DB: db}
 
-	e.GET("/product/:id", func(c echo.Context) error {
-		id := c.Param("id")
-		var product model.Product
-		result := db.First(&product, id)
-		if result.Error != nil {
-			if result.Error == gorm.ErrRecordNotFound {
-				return c.NoContent(http.StatusNotFound)
-			}
-			return c.JSON(http.StatusInternalServerError, map[string]string{"error": result.Error.Error()})
-		}
-		return c.JSON(http.StatusOK, product)
-	})
-
-	e.GET("/products", func(c echo.Context) error {
-		var products []model.Product
-		result := db.Find(&products)
-		if result.Error != nil {
-			return c.JSON(http.StatusInternalServerError, map[string]string{"error": result.Error.Error()})
-		}
-		return c.JSON(http.StatusOK, products)
-	})
-
-	e.POST("product", func(c echo.Context) error {
-		product := new(model.Product)
-		if err := c.Bind(product); err != nil {
-			return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
-		}
-		result := db.Create(product)
-		if result.Error != nil {
-			return c.JSON(http.StatusInternalServerError, map[string]string{"error": result.Error.Error()})
-		}
-		return c.JSON(http.StatusCreated, product)
-	})
+	e.GET("/", h.GetRoot)
+	e.GET("/product/:id", h.GetProductByID)
+	e.GET("/products", h.GetAllProducts)
+	e.POST("/product", h.CreateProduct)
 
 	e.Logger.Fatal(e.Start(":1323"))
 }
