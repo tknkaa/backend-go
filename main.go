@@ -27,6 +27,7 @@ func main() {
 	e.POST("/product", h.CreateProduct)
 
 	e.POST("/sign-up", h.SignUp)
+	e.POST("/sign-in", h.SignIn)
 
 	e.Logger.Fatal(e.Start(":1323"))
 }

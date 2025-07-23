@@ -51,7 +51,7 @@ func (h *Handler) SignIn(c echo.Context) error {
 	}
 
 	var user model.User
-	if result := h.DB.Where("userame = ?", req.Username).First(&user); result.Error != nil {
+	if result := h.DB.Where("username = ?", req.Username).First(&user); result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			return c.String(http.StatusUnauthorized, "no user found")
 		}
