@@ -13,20 +13,13 @@ import (
 	"gorm.io/gorm"
 )
 
-type SignUpRequest struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
-}
-
 func (h *Handler) SignUp(c echo.Context) error {
-	var req SignUpRequest
-	if err := c.Bind(&req); err != nil {
-		return c.String(http.StatusBadRequest, "bad request")
-	}
-	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(req.Password), 10)
+	password := c.FormValue("password")
+	username := c.FormValue("username")
+	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(password), 10)
 
 	newUser := model.User{
-		Username: req.Username,
+		Username: username,
 		Password: string(hashedPassword),
 	}
 
@@ -39,26 +32,20 @@ func (h *Handler) SignUp(c echo.Context) error {
 	})
 }
 
-type SignInRequest struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
-}
-
 func (h *Handler) SignIn(c echo.Context) error {
-	var req SignInRequest
-	if err := c.Bind(&req); err != nil {
-		return c.String(http.StatusBadRequest, "bad request")
-	}
-
 	var user model.User
-	if result := h.DB.Where("username = ?", req.Username).First(&user); result.Error != nil {
+
+	username := c.FormValue("username")
+	password := c.FormValue("password")
+
+	if result := h.DB.Where("username = ?", username).First(&user); result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			return c.String(http.StatusUnauthorized, "no user found")
 		}
 		return c.String(http.StatusInternalServerError, "database error")
 	}
 
-	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password)); err != nil {
+	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)); err != nil {
 		return c.String(http.StatusUnauthorized, "invalid password")
 	}
 

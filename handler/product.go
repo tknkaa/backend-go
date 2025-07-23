@@ -2,6 +2,7 @@ package handler
 
 import (
 	"net/http"
+	"strconv"
 
 	"myapp/model"
 
@@ -41,14 +42,13 @@ func (h *Handler) CreateProduct(c echo.Context) error {
 		return c.String(http.StatusInternalServerError, "could not get user from context")
 	}
 
-	var productRequest model.Product
-	if err := c.Bind(productRequest); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
-	}
+	code := c.FormValue("code")
+	priceStr := c.FormValue("price")
+	price, _ := strconv.Atoi(priceStr)
 
 	newProduct := model.Product{
-		Code:   productRequest.Code,
-		Price:  productRequest.Price,
+		Code:   code,
+		Price:  price,
 		UserId: user.ID,
 	}
 

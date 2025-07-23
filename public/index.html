@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Web App</title>
+</head>
+
+<body>
+  <h2>サインアップ</h2>
+  <p>新しいアカウントを作成します。</p>
+  <form action="/sign-up" method="post">
+    <label for="signup-username">ユーザー名:</label><br />
+    <input type="text" id="signup-username" name="username" required /><br />
+    <label for="signup-password">パスワード:</label><br />
+    <input type="password" id="signup-password" name="password" required /><br /><br />
+    <button type="submit">サインアップ</button>
+  </form>
+
+  <hr />
+
+  <h2>サインイン</h2>
+  <p>既存のアカウントでログインします。</p>
+  <form action="/sign-in" method="post">
+    <label for="signin-username">ユーザー名:</label><br />
+    <input type="text" id="signin-username" name="username" required /><br />
+    <label for="signin-password">パスワード:</label><br />
+    <input type="password" id="signin-password" name="password" required /><br /><br />
+    <button type="submit">サインイン</button>
+  </form>
+
+  <hr />
+
+  <h2>商品を見る</h2>
+  <p>商品一覧ページに移動します。（サインインが必要です）</p>
+  <form action="/api/products" method="get">
+    <button type="submit">商品を一覧表示</button>
+  </form>
+
+  <hr />
+
+  <h2>商品を作成する</h2>
+  <p>新しい商品を追加します。（サインインが必要です）</p>
+  <form action="/api/product" method="post">
+    <label for="product-code">商品コード:</label><br />
+    <input type="text" id="product-code" name="code" required /><br />
+    <label for="product-price">価格:</label><br />
+    <input type="number" id="product-price" name="price" required /><br /><br />
+    <button type="submit">商品を作成</button>
+  </form>
+</body>
+
+</html>

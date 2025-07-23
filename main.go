@@ -21,6 +21,8 @@ func main() {
 
 	h := &handler.Handler{DB: db}
 
+	e.Static("/", "public")
+
 	e.POST("/sign-up", h.SignUp)
 	e.POST("/sign-in", h.SignIn)
 
