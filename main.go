@@ -21,13 +21,15 @@ func main() {
 
 	h := &handler.Handler{DB: db}
 
-	e.GET("/", h.GetRoot)
-	e.GET("/product/:id", h.GetProductByID)
-	e.GET("/products", h.GetAllProducts)
-	e.POST("/product", h.CreateProduct)
-
 	e.POST("/sign-up", h.SignUp)
 	e.POST("/sign-in", h.SignIn)
+
+	api := e.Group("/api")
+	api.Use(h.AuthMiddleware)
+	api.GET("/", h.GetRoot)
+	api.GET("/product/:id", h.GetProductByID)
+	api.GET("/products", h.GetAllProducts)
+	api.POST("/product", h.CreateProduct)
 
 	e.Logger.Fatal(e.Start(":1323"))
 }
