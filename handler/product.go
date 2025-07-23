@@ -36,13 +36,25 @@ func (h *Handler) GetAllProducts(c echo.Context) error {
 }
 
 func (h *Handler) CreateProduct(c echo.Context) error {
-	product := new(model.Product)
-	if err := c.Bind(product); err != nil {
+	user, ok := c.Get("user").(model.User)
+	if !ok {
+		return c.String(http.StatusInternalServerError, "could not get user from context")
+	}
+
+	var productRequest model.Product
+	if err := c.Bind(productRequest); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
-	result := h.DB.Create(product)
+
+	newProduct := model.Product{
+		Code:   productRequest.Code,
+		Price:  productRequest.Price,
+		UserId: user.ID,
+	}
+
+	result := h.DB.Create(&newProduct)
 	if result.Error != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": result.Error.Error()})
 	}
-	return c.JSON(http.StatusCreated, product)
+	return c.JSON(http.StatusCreated, newProduct)
 }
