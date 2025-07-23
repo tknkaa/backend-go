@@ -15,7 +15,7 @@ func main() {
 		panic("failed to connect database")
 	}
 
-	db.AutoMigrate(&model.Product{})
+	db.AutoMigrate(&model.Product{}, &model.User{}, &model.Session{})
 
 	e := echo.New()
 
@@ -25,6 +25,8 @@ func main() {
 	e.GET("/product/:id", h.GetProductByID)
 	e.GET("/products", h.GetAllProducts)
 	e.POST("/product", h.CreateProduct)
+
+	e.POST("/sign-up", h.SignUp)
 
 	e.Logger.Fatal(e.Start(":1323"))
 }

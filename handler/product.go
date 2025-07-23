@@ -9,10 +9,6 @@ import (
 	"gorm.io/gorm"
 )
 
-type Handler struct {
-	DB *gorm.DB
-}
-
 func (h *Handler) GetRoot(c echo.Context) error {
 	return c.String(http.StatusOK, "Hello, world!\n")
 }
